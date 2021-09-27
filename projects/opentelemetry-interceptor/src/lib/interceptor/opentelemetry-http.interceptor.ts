@@ -1,4 +1,4 @@
-import { Injectable, Inject, Optional } from '@angular/core';
+import {Injectable, Inject, Optional} from '@angular/core';
 import {
   HttpRequest,
   HttpHandler,
@@ -7,11 +7,11 @@ import {
   HttpResponse,
   HttpErrorResponse
 } from '@angular/common/http';
-import { PlatformLocation } from '@angular/common';
-import { Observable } from 'rxjs';
+import {PlatformLocation} from '@angular/common';
+import {Observable} from 'rxjs';
 import * as api from '@opentelemetry/api';
-import { Sampler, Span, SpanStatusCode, DiagLogger } from '@opentelemetry/api';
-import { WebTracerProvider, StackContextManager } from '@opentelemetry/web';
+import {Sampler, Span, SpanStatusCode, DiagLogger} from '@opentelemetry/api';
+import {WebTracerProvider, StackContextManager} from '@opentelemetry/web';
 import {
   SimpleSpanProcessor,
   ConsoleSpanExporter,
@@ -24,18 +24,19 @@ import {
   TraceIdRatioBasedSampler,
   ParentBasedSampler,
 } from '@opentelemetry/core';
-import { SemanticResourceAttributes, SemanticAttributes } from '@opentelemetry/semantic-conventions';
-import { Resource } from '@opentelemetry/resources';
-import { tap, finalize } from 'rxjs/operators';
+import {SemanticResourceAttributes, SemanticAttributes} from '@opentelemetry/semantic-conventions';
+import {Resource} from '@opentelemetry/resources';
+import {tap, finalize} from 'rxjs/operators';
 import {
   OpenTelemetryConfig,
   OTELCOL_CONFIG,
 } from '../configuration/opentelemetry-config';
-import { version, name } from '../../version.json';
-import { OTELCOL_EXPORTER, IExporter } from '../services/exporter/exporter.interface';
-import { OTELCOL_PROPAGATOR, IPropagator } from '../services/propagator/propagator.interface';
-import { OTELCOL_LOGGER, CUSTOM_SPAN } from '../configuration/opentelemetry-config';
-import { CustomSpan } from './custom-span.interface';
+import {version, name} from '../../version.json';
+import {OTELCOL_EXPORTER, IExporter} from '../services/exporter/exporter.interface';
+import {OTELCOL_PROPAGATOR, IPropagator} from '../services/propagator/propagator.interface';
+import {OTELCOL_LOGGER, CUSTOM_SPAN} from '../configuration/opentelemetry-config';
+import {CustomSpan} from './custom-span.interface';
+import {EnvService} from "../services/env-service/env.service";
 
 /**
  * OpenTelemetryInterceptor class
@@ -60,6 +61,7 @@ export class OpenTelemetryHttpInterceptor implements HttpInterceptor {
   /**
    * constructor
    *
+   * @param env
    * @param config configuration
    * @param exporterService service exporter injected
    * @param propagatorService propagator injected
@@ -68,6 +70,7 @@ export class OpenTelemetryHttpInterceptor implements HttpInterceptor {
    * @param platformLocation encapsulates all calls to DOM APIs
    */
   constructor(
+    private env: EnvService,
     @Inject(OTELCOL_CONFIG) private config: OpenTelemetryConfig,
     @Inject(OTELCOL_EXPORTER)
     private exporterService: IExporter,
@@ -79,6 +82,10 @@ export class OpenTelemetryHttpInterceptor implements HttpInterceptor {
     private customSpan: CustomSpan,
     private platformLocation: PlatformLocation
   ) {
+    if (this.env.config != null) {
+      this.config = this.env.config;
+    }
+    console.log(config);
     this.tracer = new WebTracerProvider({
       sampler: this.defineProbabilitySampler(this.convertStringToNumber(config.commonConfig.probabilitySampler)),
       resource: Resource.default().merge(
@@ -122,7 +129,7 @@ export class OpenTelemetryHttpInterceptor implements HttpInterceptor {
             }
           );
           if (this.logBody && event.body != null) {
-            span.addEvent('response', { body: JSON.stringify(event.body) });
+            span.addEvent('response', {body: JSON.stringify(event.body)});
           }
           span.setStatus({
             code: SpanStatusCode.UNSET
@@ -251,12 +258,11 @@ export class OpenTelemetryHttpInterceptor implements HttpInterceptor {
    */
   private defineProbabilitySampler(sampleConfig: number): Sampler {
     if (sampleConfig >= 1) {
-      return new ParentBasedSampler({ root: new AlwaysOnSampler() });
-    }
-    else if (sampleConfig <= 0 || sampleConfig === undefined) {
-      return new ParentBasedSampler({ root: new AlwaysOffSampler() });
+      return new ParentBasedSampler({root: new AlwaysOnSampler()});
+    } else if (sampleConfig <= 0 || sampleConfig === undefined) {
+      return new ParentBasedSampler({root: new AlwaysOffSampler()});
     } else {
-      return new ParentBasedSampler({ root: new TraceIdRatioBasedSampler(sampleConfig) });
+      return new ParentBasedSampler({root: new TraceIdRatioBasedSampler(sampleConfig)});
     }
   }
 

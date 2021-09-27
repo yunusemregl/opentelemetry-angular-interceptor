@@ -10,6 +10,7 @@
     "start": "ng serve",
     "build": "ng build",
     "build:prod": "ng build opentelemetry-interceptor --prod && cp README.md dist/opentelemetry-interceptor/README.md",
+    "build:prod-interceptor": "ng build interceptor-example --prod && cp README.md dist/interceptor-example/README.md",
     "test": "jest --coverage",
     "lint": "ng lint",
     "release": "standard-version",

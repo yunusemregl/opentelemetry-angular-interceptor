@@ -1,17 +1,18 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../environments/environment';
-import { forkJoin, Observable } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
-import { Result } from './result';
+import {Injectable} from '@angular/core';
+import {environment} from '../environments/environment';
+import {forkJoin, Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {map} from 'rxjs/operators';
+import {Result} from './result';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ExampleService {
-  private urlTestBackend: string = environment.urlTest;
+  private urlTestBackend: string = 'http://localhost:4200/api'; //environment.urlTest;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly http: HttpClient) {
+  }
 
   getApiBackend(): Observable<Result> {
     return this.http

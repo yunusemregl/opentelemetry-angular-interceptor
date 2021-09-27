@@ -13,13 +13,14 @@
           "builder": "@angular-devkit/build-ng-packagr:build",
           "options": {
             "tsConfig": "projects/opentelemetry-interceptor/tsconfig.lib.json",
-            "project": "projects/opentelemetry-interceptor/ng-package.json"
+            "project": "projects/opentelemetry-interceptor/ng-package.json",
           },
           "configurations": {
             "production": {
               "tsConfig": "projects/opentelemetry-interceptor/tsconfig.lib.prod.json"
             }
-          }
+          },
+
         },
         "lint": {
           "builder": "@angular-eslint/builder:lint",
@@ -65,7 +66,8 @@
             "aot": true,
             "assets": [
               "projects/interceptor-example/src/favicon.ico",
-              "projects/interceptor-example/src/assets"
+              "projects/interceptor-example/src/assets",
+              "projects/interceptor-example/src/env.js"
             ],
             "styles": [
               "./node_modules/@angular/material/prebuilt-themes/purple-green.css",
